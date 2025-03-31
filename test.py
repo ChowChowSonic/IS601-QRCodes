@@ -1,12 +1,15 @@
 """Testing app"""
 from main import main
 
-def test_main():
+def test_main(caplog):
     """Tests main"""
-    with open("app.log", 'r', encoding='utf-8') as file:
-        pass
+    caplog.set_level("INFO")
     main(["main.py", "www.google.com"])
-    with open("app.log", 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-        assert 'Successfully created image' in ''.join(x for x in lines)
-        assert 'Successfully saved image to' in ''.join(x for x in lines)
+    err = ''.join(x[2] for x in caplog.record_tuples)
+    assert 'Successfully created image' in err
+    assert 'Successfully saved image to' in err
+def test_err(caplog):
+    """Tests error logging"""
+    main([])
+    err = ''.join(x[2] for x in caplog.record_tuples)
+    assert 'Please provide a url' in err
